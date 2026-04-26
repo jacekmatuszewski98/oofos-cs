@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>OOFOS × Force of Nature — A 12-Month Rebuild</title>
+<meta name="description" content="How Force of Nature rebuilt OOFOS's growth engine — from -33% YoY to +78% new customers in twelve months." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<style>
+:root {
+  --bg: #f5f1ea;
+  --bg-soft: #ede7dc;
+  --ink: #1f1d1a;
+  --ink-soft: #4a463f;
+  --ink-faint: #8a8278;
+  --rule: #d9d1c1;
+  --accent: #b8552d;
+  --accent-soft: #d97a4e;
+  --accent-bg: rgba(184, 85, 45, 0.08);
+  --positive: #4a6741;
+  --negative: #8a3a2a;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Instrument Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 17px;
+  line-height: 1.6;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* ─── Typography scale ─── */
+
+.eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+h1, h2, h3 {
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+h1 {
+  font-size: clamp(2.5rem, 6vw, 4.8rem);
+  line-height: 1.02;
+  font-weight: 400;
+  font-variation-settings: 'opsz' 144, 'SOFT' 30;
+}
+
+h1 em {
+  font-style: italic;
+  color: var(--accent);
+  font-variation-settings: 'opsz' 144;
+}
+
+h2 {
+  font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+  line-height: 1.15;
+  margin-bottom: 0.5em;
+}
+
+h3 {
+  font-size: 1.4rem;
+  line-height: 1.3;
+  margin-bottom: 0.4em;
+  font-weight: 500;
+}
+
+p { margin-bottom: 1.3em; color: var(--ink-soft); }
+
+p strong { color: var(--ink); font-weight: 600; }
+
+a { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent-soft); }
+a:hover { color: var(--ink); border-color: var(--ink); }
+
+::selection { background: var(--accent); color: var(--bg); }
+
+/* ─── Layout primitives ─── */
+
+.container {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 0 28px;
+}
+
+.container-wide {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 0 28px;
+}
+
+section { padding: 96px 0; position: relative; }
+section + section { padding-top: 0; }
+
+/* ─── Header / Nav ─── */
+
+header.site-header {
+  padding: 28px 0 0;
+  position: relative;
+  z-index: 10;
+}
+
+.site-header-inner {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 0 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.site-header-inner .brand {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+/* ─── Hero ─── */
+
+.hero {
+  padding: 100px 0 80px;
+  position: relative;
+}
+
+.hero-meta {
+  display: flex;
+  gap: 32px;
+  margin-bottom: 56px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.hero-meta span { color: var(--ink); }
+
+.hero h1 {
+  margin-bottom: 36px;
+  max-width: 14ch;
+}
+
+.hero-deck {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: clamp(1.15rem, 1.8vw, 1.4rem);
+  line-height: 1.5;
+  color: var(--ink-soft);
+  font-weight: 300;
+  max-width: 50ch;
+  margin-bottom: 64px;
+  font-style: italic;
+}
+
+/* Hero stat strip */
+
+.hero-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  margin-top: 48px;
+}
+
+.hero-stat {
+  padding: 28px 24px 28px 0;
+  border-right: 1px solid var(--rule);
+}
+
+.hero-stat:last-child { border-right: none; padding-right: 0; }
+.hero-stat:not(:first-child) { padding-left: 24px; }
+
+.hero-stat-value {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
+  line-height: 1;
+  font-weight: 400;
+  color: var(--ink);
+  margin-bottom: 8px;
+  letter-spacing: -0.02em;
+}
+
+.hero-stat-value.positive { color: var(--accent); }
+
+.hero-stat-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  line-height: 1.4;
+}
+
+@media (max-width: 720px) {
+  .hero-stats { grid-template-columns: repeat(2, 1fr); }
+  .hero-stat:nth-child(2) { border-right: none; padding-right: 0; }
+  .hero-stat:nth-child(1), .hero-stat:nth-child(2) { border-bottom: 1px solid var(--rule); }
+  .hero-stat:nth-child(3) { padding-left: 0; }
+  .hero-stat:nth-child(4) { padding-left: 24px; }
+}
+
+/* ─── Body sections ─── */
+
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 32px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.section-label::before {
+  content: "";
+  width: 32px;
+  height: 1px;
+  background: var(--accent);
+}
+
+.section-label .num { color: var(--accent); }
+
+article p { font-size: 17px; line-height: 1.65; }
+
+article h2 { margin-top: 0; margin-bottom: 28px; max-width: 24ch; }
+
+article h2 + p:first-of-type::first-letter,
+.dropcap::first-letter {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 4.2em;
+  line-height: 0.9;
+  float: left;
+  padding: 0.08em 0.12em 0 0;
+  font-weight: 400;
+  color: var(--accent);
+  font-style: normal;
+}
+
+/* Pull quote */
+
+blockquote {
+  margin: 48px 0;
+  padding: 32px 0 32px 32px;
+  border-left: 2px solid var(--accent);
+  font-family: 'Fraunces', Georgia, serif;
+  font-style: italic;
+  font-size: 1.5rem;
+  line-height: 1.4;
+  color: var(--ink);
+  font-weight: 300;
+  max-width: 38ch;
+}
+
+/* ─── Chart section ─── */
+
+.chart-section {
+  background: var(--bg-soft);
+  padding: 80px 0;
+  margin: 80px 0;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+}
+
+.chart-block {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 0 28px;
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 32px;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.chart-title {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.6rem;
+  line-height: 1.25;
+  color: var(--ink);
+  margin-bottom: 6px;
+  font-weight: 400;
+  max-width: 36ch;
+}
+
+.chart-subtitle {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.chart-toggle {
+  display: flex;
+  gap: 4px;
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  padding: 3px;
+  border-radius: 3px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.chart-toggle button {
+  background: transparent;
+  border: none;
+  padding: 8px 14px;
+  cursor: pointer;
+  color: var(--ink-faint);
+  font-family: inherit;
+  font-size: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  border-radius: 2px;
+  transition: all 0.2s ease;
+}
+
+.chart-toggle button.active {
+  background: var(--ink);
+  color: var(--bg);
+}
+
+.chart-toggle button:hover:not(.active) { color: var(--ink); }
+
+.chart-canvas-wrap {
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  padding: 28px 24px 16px;
+  position: relative;
+  height: 380px;
+}
+
+.chart-caption {
+  font-size: 14px;
+  color: var(--ink-faint);
+  margin-top: 16px;
+  font-style: italic;
+  line-height: 1.5;
+  max-width: 60ch;
+}
+
+/* ─── Inversion block (Prospecting vs Retargeting) ─── */
+
+.inversion-block {
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  padding: 64px 48px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 24px;
+}
+
+.inversion-side {
+  text-align: center;
+  position: relative;
+}
+
+.inversion-period {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.3rem;
+  font-weight: 400;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+  margin-bottom: 4px;
+}
+
+.inversion-meta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 32px;
+}
+
+.inversion-figure {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  margin-bottom: 16px;
+  line-height: 1;
+}
+
+.inversion-num {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: clamp(5rem, 12vw, 9rem);
+  font-weight: 300;
+  letter-spacing: -0.04em;
+  line-height: 0.9;
+  font-variation-settings: 'opsz' 144, 'SOFT' 30;
+}
+
+.inversion-pct {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 300;
+  margin-left: 4px;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.inversion-before .inversion-num,
+.inversion-before .inversion-pct {
+  color: var(--ink-faint);
+}
+
+.inversion-after .inversion-num,
+.inversion-after .inversion-pct {
+  color: var(--accent);
+}
+
+.inversion-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink);
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.inversion-secondary {
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: 13px;
+  font-style: italic;
+  color: var(--ink-faint);
+}
+
+/* Center bridge with arrow */
+.inversion-bridge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-width: 100px;
+  max-width: 200px;
+  width: 14vw;
+  margin-top: 56px; /* offset to align with figures */
+}
+
+.inversion-bridge svg {
+  width: 100%;
+  height: 30px;
+  display: block;
+}
+
+.bridge-line {
+  stroke: var(--rule);
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+}
+
+.bridge-arrow {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.inversion-bridge-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  white-space: nowrap;
+}
+
+/* Mobile: stack vertically */
+@media (max-width: 720px) {
+  .inversion-block {
+    grid-template-columns: 1fr;
+    padding: 40px 24px;
+    gap: 32px;
+  }
+
+  .inversion-bridge {
+    width: 60%;
+    max-width: 240px;
+    margin: 0 auto;
+    transform: rotate(90deg);
+    margin-top: 0;
+  }
+
+  .inversion-bridge-label {
+    transform: rotate(-90deg);
+    position: relative;
+  }
+}
+
+/* ─── KPI Comparison block (Q1 vs Q1) ─── */
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+}
+
+.kpi-cell {
+  background: var(--bg);
+  padding: 32px 28px;
+}
+
+.kpi-cell h4 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 16px;
+  font-weight: 500;
+}
+
+.kpi-numbers {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.kpi-then {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.8rem;
+  color: var(--ink-faint);
+  font-weight: 300;
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+
+.kpi-arrow {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--accent);
+  font-size: 14px;
+}
+
+.kpi-now {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 2.4rem;
+  color: var(--ink);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
+.kpi-change {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.kpi-change.negative { color: var(--negative); }
+
+@media (max-width: 720px) {
+  .kpi-grid { grid-template-columns: 1fr; }
+}
+
+/* ─── Phase divider ─── */
+
+.phase-divider {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin: 80px 0 56px;
+}
+
+.phase-divider .phase-num {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 3.5rem;
+  font-style: italic;
+  color: var(--accent);
+  font-weight: 300;
+  line-height: 1;
+}
+
+.phase-divider .phase-title {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.8rem;
+  color: var(--ink);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+.phase-divider .phase-meta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-top: 4px;
+  display: block;
+}
+
+/* ─── Inline data callouts ─── */
+
+.data-pill {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  background: var(--accent-bg);
+  color: var(--accent);
+  padding: 2px 8px;
+  border-radius: 2px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* ─── Closing section ─── */
+
+.closing {
+  background: var(--ink);
+  color: var(--bg);
+  padding: 120px 0;
+  margin-top: 96px;
+}
+
+.closing h2 {
+  color: var(--bg);
+  font-size: clamp(2rem, 4vw, 3rem);
+  max-width: 18ch;
+  font-style: italic;
+  font-weight: 300;
+}
+
+.closing p { color: rgba(245, 241, 234, 0.7); }
+
+.closing .eyebrow { color: var(--accent-soft); }
+
+/* ─── Footer ─── */
+
+footer {
+  padding: 40px 0 60px;
+  border-top: 1px solid var(--rule);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+footer .container-wide {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+/* ─── Reveal animation on scroll ─── */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ─── Responsive tweaks ─── */
+
+@media (max-width: 720px) {
+  section { padding: 72px 0; }
+  .hero { padding: 60px 0 50px; }
+  .chart-section { padding: 60px 0; margin: 60px 0; }
+  .chart-canvas-wrap { height: 320px; padding: 20px 14px 12px; }
+  blockquote { font-size: 1.25rem; padding-left: 20px; }
+  .hero-meta { flex-wrap: wrap; gap: 16px; }
+}
+
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header-inner">
+    <span class="brand">Force of Nature × OOFOS</span>
+    <span>Case Study / 2025—2026</span>
+  </div>
+</header>
+
+<!-- ─── HERO ─── -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-meta">
+      <div><span>Industry</span><br>Recovery Footwear</div>
+      <div><span>Engagement</span><br>April 2025—Ongoing</div>
+      <div><span>Scope</span><br>Performance &amp; MarTech</div>
+    </div>
+
+    <h1>From <em>−33% YoY</em> to +78% new customers in twelve months.</h1>
+
+    <p class="hero-deck">How Force of Nature rebuilt OOFOS's growth engine — and the incrementality-led framework that made it compound.</p>
+
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-value positive">+77.7%</div>
+        <div class="hero-stat-label">New Customers<br>Q1'26 vs Q1'25</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-value positive">−29.7%</div>
+        <div class="hero-stat-label">Blended nCAC<br>$48.98 → $34.42</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-value">+14.0%</div>
+        <div class="hero-stat-label">Revenue<br>$13.92M Q1'26</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-value">95 / 5</div>
+        <div class="hero-stat-label">Prospecting / Retargeting<br>From 51 / 49</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── ACT 1: SETUP ─── -->
+<section>
+  <article class="container">
+    <div class="section-label"><span class="num">01</span> The Setup</div>
+    <h2>The right race, the wrong engine.</h2>
+
+    <p class="dropcap">By early 2025, OOFOS was sitting in an enviable category and a difficult position at the same time. The recovery footwear market was growing fast. Search interest was up roughly 150% over five years, and the forecasts pointed to continued expansion through 2026. OOFOS had genuine product-market fit, a loyal base, and a brand customers actively recommended to friends. The product wasn't the problem.</p>
+
+    <p>The growth engine was.</p>
+
+    <p>Q1 2025 closed with revenue down <span class="data-pill">33% YoY</span>. New customer acquisition was down 55%. Returning customer revenue was carrying the topline while the new-customer funnel quietly drained. BFCM 2024 had already come in 19% below the prior year, which was the early warning that the issue wasn't seasonal noise. Something structural was breaking.</p>
+
+    <p>When Force of Nature ran its initial Opportunity Analysis, the diagnosis was uncomfortable in its specificity. Roughly <strong>70% of Google Ads spend was going to brand terms</strong>, capturing demand that already existed rather than generating new demand. Over <strong>$800K of Meta spend was reaching existing customers</strong>, with frequency caps blown past 46 impressions per user. About <strong>28% of TikTok budget was running against retargeting</strong>, on a platform whose entire mechanic is discovery. Linear TV was eating up to <strong>41% of media mix in peak months</strong>, and it correlated negatively with new cohort acquisition.</p>
+
+    <p>Channel scorecards across the board sat at 5/10 or 6/10. The accounts weren't broken. They were over-optimized for the wrong thing. Almost every dollar was being spent to harvest existing intent, and almost no dollars were being spent to generate it.</p>
+
+    <blockquote>OOFOS is in the right race, but the engine is misfiring.</blockquote>
+  </article>
+</section>
+
+<!-- ─── CHART 1: YoY New Customer Trajectory ─── -->
+<div class="chart-section">
+  <div class="chart-block">
+    <div class="chart-header">
+      <div>
+        <div class="chart-title">The headline arc.</div>
+        <div class="chart-subtitle">YoY New Customer Growth · Monthly</div>
+      </div>
+    </div>
+    <div class="chart-canvas-wrap">
+      <canvas id="chart-trajectory"></canvas>
+    </div>
+    <p class="chart-caption">Force of Nature engagement begins April 2025. Through Q2 the team rebuilt account structures and rebalanced spend toward prospecting; from August onward, new-customer growth turned and stayed positive every month through Q1 2026.</p>
+  </div>
+</div>
+
+<!-- ─── ACT 2: DIAGNOSIS ─── -->
+<section>
+  <article class="container">
+    <div class="section-label"><span class="num">02</span> The Diagnosis</div>
+    <h2>Two questions, three phases.</h2>
+
+    <p>Force of Nature's Opportunity Analysis didn't open with a list of tactics. It opened with two questions.</p>
+
+    <p><strong>Are we doing it right? How much more demand can we capture?</strong></p>
+
+    <p>The first question forced an honest channel-by-channel audit. The second forced the team to stop benchmarking against last quarter and start benchmarking against the addressable market.</p>
+
+    <p>Out of those two questions came a three-phase plan. <strong>Phase 1</strong> was about getting the engine running right: fixing the media inefficiencies, deploying channel best practices, shifting focus from retargeting to net-new acquisition, and consolidating the fragmented account structures. <strong>Phase 2</strong> was about capturing the full market opportunity, which meant building forecasts, optimizing seasonal allocation, and realigning the media mix away from low-impact broad reach into high-intent networks. <strong>Phase 3</strong> was about installing a data-driven system: moving from reactive marketing to real-time decision-making, prioritizing long-term profitability over short-term ROAS, and putting incrementality at the center of measurement.</p>
+
+    <p>The framing matters because it set expectations correctly from day one. The mandate wasn't to make 2025 outperform 2024. It was to stop the bleeding, rebuild the acquisition engine, and put a system in place that compounds. Twelve months later, the Q1 2026 numbers told the story of all three phases executing in sequence.</p>
+
+    <div class="phase-divider">
+      <span class="phase-num">i.</span>
+      <div>
+        <div class="phase-title">The Rebuild</div>
+        <span class="phase-meta">Q2 2025 · April—June</span>
+      </div>
+    </div>
+
+    <p>The first ninety days were structural. Not a campaign refresh. Not a creative overhaul. An account-level reset across every paid channel.</p>
+
+    <p>Meta was running ten or more active campaigns simultaneously, splitting algorithmic learning across too many surfaces to ever build liquidity on any of them. Force of Nature consolidated to five campaigns, then four. Reservation-based campaigns were disabled in favor of auction. Spend allocated to existing customers, which sat above 25% of the total at engagement start, was reduced systematically to <span class="data-pill">17.7% by end of June</span>, with further reductions on the roadmap. By June, more than half of Meta spend had shifted to dynamic product ads, which were delivering CACs of $28.27 against an account average of $30.46.</p>
+
+    <p>Google Ads was fragmented across dozens of low-budget campaigns, none of which had enough daily spend to escape the algorithm's learning phase. The team consolidated by funnel stage and seasonality, removed budget caps where possible, and let ROAS targets govern delivery. Branded retargeting wasn't eliminated, but it stopped being the strategy.</p>
+
+    <p>TikTok had been running 30%+ of budget against the 55+ age cohort and treating the platform like a remarketing channel. Spend to existing customers was cut to zero. The 55+ allocation dropped to 21% by end of Q2. Spark Ads with creator handles became the format of focus.</p>
+
+    <p>DV360 had been running YouTube only. Display, video, and CTV came online with audience segmentation across publisher custom segments, custom affinity, and intent, finally using the platform as a top-funnel tool rather than a YouTube delivery mechanism.</p>
+
+    <p>By June the structural surgery was visible in the numbers. Prospecting spend was up <span class="data-pill">+220% YoY in May</span> and 98% in June. The YoY new customer gap had closed from −54% in Q1 to −10% in Q2. Q2 revenue landed at −9.4% YoY, compared to −33% in Q1. Prospecting share of paid media had jumped from roughly 7% to 37% of the mix.</p>
+
+    <p>The trade-off was real, and it was named honestly. nCAC ticked up 16% YoY in May before settling at +2.88% in June. That was the cost of buying back acquisition velocity. It was the right cost to pay.</p>
+  </article>
+</section>
+
+<!-- ─── CHART 2: Prospecting vs Retargeting — Editorial Comparison ─── -->
+<div class="chart-section">
+  <div class="chart-block">
+    <div class="chart-header">
+      <div>
+        <div class="chart-title">Rewiring the funnel.</div>
+        <div class="chart-subtitle">Prospecting Share of Paid Media · Q1 2025 → Q1 2026</div>
+      </div>
+    </div>
+
+    <div class="inversion-block">
+      <div class="inversion-side inversion-before">
+        <div class="inversion-period">Q1 2025</div>
+        <div class="inversion-meta">Pre-engagement</div>
+        <div class="inversion-figure">
+          <span class="inversion-num">7</span><span class="inversion-pct">%</span>
+        </div>
+        <div class="inversion-label">Prospecting</div>
+        <div class="inversion-secondary">93% Retargeting</div>
+      </div>
+
+      <div class="inversion-bridge" aria-hidden="true">
+        <svg viewBox="0 0 200 60" preserveAspectRatio="none">
+          <line x1="0" y1="30" x2="200" y2="30" class="bridge-line"/>
+          <polyline points="190,22 200,30 190,38" class="bridge-arrow"/>
+        </svg>
+        <div class="inversion-bridge-label">THE INVERSION</div>
+      </div>
+
+      <div class="inversion-side inversion-after">
+        <div class="inversion-period">Q1 2026</div>
+        <div class="inversion-meta">Twelve months later</div>
+        <div class="inversion-figure">
+          <span class="inversion-num">95</span><span class="inversion-pct">%</span>
+        </div>
+        <div class="inversion-label">Prospecting</div>
+        <div class="inversion-secondary">5% Retargeting</div>
+      </div>
+    </div>
+
+    <p class="chart-caption">Force of Nature inherited an account architecture in which 93% of paid media was working against existing customers. Twelve months later the ratio had inverted. This single structural shift unlocked acquisition at a scale the original setup could not have supported.</p>
+  </div>
+</div>
+
+<!-- ─── PHASE 2: BREAKTHROUGH ─── -->
+<section>
+  <article class="container">
+    <div class="phase-divider">
+      <span class="phase-num">ii.</span>
+      <div>
+        <div class="phase-title">The Breakthrough</div>
+        <span class="phase-meta">Q3 2025 · July—September</span>
+      </div>
+    </div>
+
+    <p>Q3 was when the rebuild stopped looking like a recovery and started looking like a system.</p>
+
+    <p>New customers grew <span class="data-pill">+117% YoY in August</span> and 105% in September. Revenue grew 72% in August and 38% in September. nCAC moved to −10.98% YoY in August, which was the first month efficiency moved with volume rather than against it.</p>
+
+    <p>The August End-of-Season Sale exceeded forecasts to the point operations had to throttle volume because the warehouse couldn't ship fast enough. That moment, more than any single number on a dashboard, signalled the engine was running.</p>
+
+    <p>Two strategic principles crystallized in Q3 and have governed every decision since.</p>
+
+    <p>The first: <strong>paid is for acquisition, owned is for retention</strong>. Once the team stopped trying to make paid media do both jobs, both jobs got easier. Prospecting share of paid budget pushed to 90—95%. Email and SMS picked up the returning-customer volume that retargeting had been awkwardly subsidizing. Each channel started doing what it was structurally good at.</p>
+
+    <p>The second: <strong>scale is driven upstream, not manufactured at the point of conversion</strong>. Cohort growth in Q3 wasn't the result of better landing pages or smarter retargeting windows. It was the result of more sessions, more brand impressions, more cold-audience reach. The work happens at the top of the funnel and the lift propagates down.</p>
+
+    <div class="phase-divider">
+      <span class="phase-num">iii.</span>
+      <div>
+        <div class="phase-title">The Pressure Test</div>
+        <span class="phase-meta">Q4 2025 · October—December</span>
+      </div>
+    </div>
+
+    <p>A rebuilt engine that performs in calm conditions is a hypothesis. Q4 was the stress test.</p>
+
+    <p>The 90/95 prospecting split held throughout. There was no defensive retreat to retargeting when budgets got tight. New customer growth continued uninterrupted year-over-year every month from August onward.</p>
+
+    <p>The BFCM execution was where the strategy proved itself most clearly. Rather than treating BFCM as a single promotional moment, the team split it into phases, with a build-up window starting November 9th designed to seed the funnel before the actual promo launch. Conversions during build-up lagged on purpose, because the leading indicators being watched were brand impressions and prospecting reach, not daily revenue.</p>
+
+    <p><strong>Black Friday delivered an all-time high revenue, up 12.08% YoY.</strong> Day 1 of the promo period came in 65% above forecast at roughly $27 nCAC and 7x ROAS. November 24 finished 63.94% above forecast. Black Friday itself drove a 45.38% returning customer uplift alongside a 44.48% new customer uplift.</p>
+
+    <p>The October Cozy Sale, a smaller test of the same playbook, had already validated it. Four promo days closed at $37.68 nCAC and 4.71 DTC ROAS, with more than 6,000 new customers and 8,000 returning customers acquired during the window.</p>
+
+    <p>Owned channels handled the returning-customer volume during loyalty promos so cleanly that retargeting spend could be held nearly flat throughout, varying by less than $400 across the entire promo period. That single data point validated the "Paid = Acquisition, Owned = Retention" split more than any deck slide could.</p>
+  </article>
+</section>
+
+<!-- ─── CHART 3: Channel Spend Mix — Diverging Bars ─── -->
+<div class="chart-section">
+  <div class="chart-block">
+    <div class="chart-header">
+      <div>
+        <div class="chart-title">Where the money moved.</div>
+        <div class="chart-subtitle">Channel Spend · Q1 2025 ←→ Q1 2026</div>
+      </div>
+    </div>
+    <div class="chart-canvas-wrap" style="height: 480px;">
+      <canvas id="chart-channelmix"></canvas>
+    </div>
+    <p class="chart-caption">Meta scaled into the lead acquisition role with $713K of additional spend. Google's spend dropped while channel-attributed revenue grew 51%. Bing and YouTube were cut entirely; Roku, DV360 and Pinterest came online as upper-funnel infrastructure.</p>
+  </div>
+</div>
+
+<!-- ─── INCREMENTALITY ─── -->
+<section>
+  <article class="container">
+    <div class="section-label"><span class="num">03</span> The Strategic Backbone</div>
+    <h2>Incrementality as the system of record.</h2>
+
+    <p class="dropcap">This is the part of the engagement that prospective clients should look at most closely.</p>
+
+    <p>By Q4 2025, with $3.5M+ flowing across seven active channels, last-click ROAS had stopped being a useful decision-making tool. It systematically over-credits channels that intercept existing intent, like branded search, retargeting, and lower-funnel display. It systematically under-credits channels that build that intent in the first place, like CTV, TikTok, and upper-funnel programmatic.</p>
+
+    <p>If budget allocation gets driven by last-click reporting, the channels that build demand will lose budget to the channels that harvest it. Eventually there's no demand left to harvest. That is the slow-motion failure mode that ends with declining cohorts and rising CACs, and it's exactly what was playing out at OOFOS in early 2025.</p>
+
+    <p>Force of Nature's response was to install <strong>HAUS geo-holdout testing</strong> as the measurement spine, complemented by Triple Whale for multi-touch attribution. HAUS methodology is structurally simple. You expose one set of geographic markets to a channel, hold another set out, and measure the difference in business outcomes. The output is an <strong>incrementality coefficient</strong>: what revenue the business would have actually lost if that channel hadn't existed.</p>
+
+    <p>That changes the budget allocation conversation entirely. Instead of comparing platform-reported ROAS numbers that all use different attribution windows and self-credit conversions, every dollar's marginal return can be modeled against every other dollar's marginal return on a consistent basis. Budget allocation becomes a P&L optimization problem rather than a reporting comparison.</p>
+
+    <p>The Q4 2025 and Q1 2026 testing program included <strong>CTV incrementality testing</strong> on Roku and Axon, which together accounted for over $307K of Q1 2026 spend with no meaningful last-click attribution. The only way to know whether that money was working was to measure it incrementally. <strong>Meta scale incrementality testing</strong> answered a different question: at what spend level does Meta begin experiencing diminishing incremental returns? The team can now model this directly rather than infer it from CPA drift. <strong>Cross-channel halo testing</strong> examined whether TikTok spend lifts Meta conversion rates, and whether CTV pre-loads audiences that Meta then converts. The hypothesis that TikTok creates awareness, Meta captures intent, and Google closes can now be tested rather than assumed.</p>
+
+    <p>AppLovin's first HAUS test came in below the 1.5x iROAS target, which the team interpreted as over-scaling rather than structural failure. Pinterest's October test posted a positive 1.02 iROAS even in low-demand conditions, with a retest planned for early Q2 2026 against a 1.5x target.</p>
+
+    <p>The strategic point isn't that incrementality testing produced specific channel decisions. The point is that the entire budget allocation conversation now happens on different terms. That's a fundamentally different operating model from "which campaign has the best ROAS this week."</p>
+  </article>
+</section>
+
+<!-- ─── DEMAND ENGINE ─── -->
+<section>
+  <article class="container">
+    <div class="section-label"><span class="num">04</span> The Demand Engine</div>
+    <h2>One foundation, five surfaces.</h2>
+
+    <p>The other tactical foundation worth surfacing is how Force of Nature reorganized creative and content strategy around a single underlying logic.</p>
+
+    <p>The framework rests on four immutable questions. <strong>Who are we talking to? Why do they care? What product or solution fits them? What benefit actually matters to them?</strong></p>
+
+    <p>From those four questions, the team builds <strong>Demand Themes</strong>, which are the intersection of audience, angle, and product. Audiences get scored by search demand, market size, and seasonal lift. Angles get evaluated by total search volume, growth trajectory, and seasonality. Products get prioritized by business seasonality, revenue contribution, and conversion role.</p>
+
+    <p>A single Demand Theme — for example, <em>"Injured Athletes × Comfort × Slides"</em> — then becomes the source of truth that powers five distinct execution surfaces: paid creative across Meta, TikTok, Pinterest, and DV360; landing pages built to convert paid traffic and rank organically; SEO topical clusters with supporting content hubs feeding internal links; organic social distribution that repurposes paid creative themes; and AI search visibility through entity coverage and structured signals across the open web.</p>
+
+    <p>This matters tactically because it solves the creative volume problem at scale. At $1.91M in Meta spend per quarter, industry benchmarks suggest 30 to 50 active creative variants are required to avoid algorithm fatigue and audience burnout. Producing that volume from scratch is impossible. Producing it from a structured Demand Theme matrix, with AI-assisted variant generation and an always-on creator network, is achievable.</p>
+
+    <blockquote>Creative is no longer "ideas." It's systematic coverage of demand narratives.</blockquote>
+  </article>
+</section>
+
+<!-- ─── CHART 4: Q1 vs Q1 KPI block ─── -->
+<div class="chart-section">
+  <div class="chart-block">
+    <div class="chart-header">
+      <div>
+        <div class="chart-title">The Q1 2026 payoff.</div>
+        <div class="chart-subtitle">Twelve months of compounding · Q1 2025 → Q1 2026</div>
+      </div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi-cell">
+        <h4>New Customers</h4>
+        <div class="kpi-numbers">
+          <span class="kpi-then">58,685</span>
+          <span class="kpi-arrow">→</span>
+          <span class="kpi-now">104,267</span>
+        </div>
+        <div class="kpi-change">+77.7% YoY</div>
+      </div>
+      <div class="kpi-cell">
+        <h4>Blended nCAC</h4>
+        <div class="kpi-numbers">
+          <span class="kpi-then">$48.98</span>
+          <span class="kpi-arrow">→</span>
+          <span class="kpi-now">$34.42</span>
+        </div>
+        <div class="kpi-change">−29.7% YoY</div>
+      </div>
+      <div class="kpi-cell">
+        <h4>Revenue (US)</h4>
+        <div class="kpi-numbers">
+          <span class="kpi-then">$12.21M</span>
+          <span class="kpi-arrow">→</span>
+          <span class="kpi-now">$13.92M</span>
+        </div>
+        <div class="kpi-change">+14.0% YoY</div>
+      </div>
+      <div class="kpi-cell">
+        <h4>Google Ads ROAS</h4>
+        <div class="kpi-numbers">
+          <span class="kpi-then">4.6×</span>
+          <span class="kpi-arrow">→</span>
+          <span class="kpi-now">9.1×</span>
+        </div>
+        <div class="kpi-change">+97.8% YoY · spend −24.9%</div>
+      </div>
+      <div class="kpi-cell">
+        <h4>Meta Spend</h4>
+        <div class="kpi-numbers">
+          <span class="kpi-then">$1.20M</span>
+          <span class="kpi-arrow">→</span>
+          <span class="kpi-now">$1.91M</span>
+        </div>
+        <div class="kpi-change">+59.3% YoY · nCAC held</div>
+      </div>
+      <div class="kpi-cell">
+        <h4>Avg. Monthly Cohort</h4>
+        <div class="kpi-numbers">
+          <span class="kpi-then">19,562</span>
+          <span class="kpi-arrow">→</span>
+          <span class="kpi-now">34,756</span>
+        </div>
+        <div class="kpi-change">Largest in company history</div>
+      </div>
+    </div>
+    <p class="chart-caption">Twelve months after engagement kickoff, the headline numbers told the story of all three phases compounding. 78% more new customers acquired on 21% more spend.</p>
+  </div>
+</div>
+
+<!-- ─── ACT 5: PAYOFF & WHAT'S NEXT ─── -->
+<section>
+  <article class="container">
+    <div class="section-label"><span class="num">05</span> The Payoff</div>
+    <h2>Three levers, one operating system.</h2>
+
+    <p>Three Q1 2026 levers tell the tactical story underneath the headline numbers.</p>
+
+    <p>The structural shift from a roughly 51/49 prospecting/retargeting split to <strong>95/5</strong> was the single most consequential decision of the quarter. January 2026's nCAC of $28.04 was the lowest single month in account history. If Q1 2026's volume had been acquired at Q1 2025's nCAC, total spend would have been roughly $1.5M higher for identical output.</p>
+
+    <p>Meta operated as the primary acquisition engine. Q1 2026 Meta spend was $1.91M, up 59% year-over-year, at a $34.42 average nCAC. Efficiency held across the ramp: January nCAC at $28, February at $37, March at $38. Volume at scale, not volume at any price.</p>
+
+    <p>Google moved in the opposite direction, with efficiency taking priority over scale. Q1 2026 Google spend was $342K lower than Q1 2025, while channel-attributed revenue grew 51%. ROAS moved from 4.6x to 9.1x. Bing ($72K) and YouTube ($81K) were cut entirely, with the freed budget redeployed into Meta and upper-funnel brand channels.</p>
+
+    <p>The cohorts entering the retention funnel in Q1 2026 were the largest in OOFOS company history. The monthly average climbed to 34,756 new customers, compared to 19,562 in Q1 2025. Every retention intervention going forward operates on a customer base nearly twice the size.</p>
+
+    <h3 style="margin-top: 56px;">What's next.</h3>
+
+    <p>The most credible signal that this isn't a "we won" story is that Force of Nature is already pointing at what's next.</p>
+
+    <p>Q1 2026 surfaced a <strong>checkout gap</strong>. Checkouts initiated grew 310% year-over-year, from 217K to 890K. The checkout-to-purchase rate compressed from 52.9% to 19.6%. The team estimates that a conservative recovery scenario, which would mean moving checkout-to-purchase back to 35%, would have added approximately <span class="data-pill">$4.2M in revenue</span> in Q1 alone, at zero additional media spend.</p>
+
+    <p>That's not a failure of the acquisition engine. It's a different problem entirely, sitting downstream of the work that's been done. It's also the single largest revenue opportunity for Q2 2026. Q1 was about building the acquisition engine. Q2 is about extracting value from what it produces.</p>
+
+    <p>The compounding logic is also already in motion. Paid customer acquisition gets more expensive at scale. Organic acquisition gets cheaper. Building organic infrastructure now, through the same Demand Theme foundation that powers paid, means lower blended nCAC at every future growth milestone.</p>
+  </article>
+</section>
+
+<!-- ─── CLOSING ─── -->
+<section class="closing">
+  <div class="container">
+    <div class="eyebrow" style="margin-bottom: 24px;">The Takeaway</div>
+    <h2>The headline outcome was 78% more new customers at 30% lower nCAC. The underlying outcome was an operating system.</h2>
+    <p style="margin-top: 32px; font-style: italic; font-family: 'Fraunces', Georgia, serif; font-size: 1.2rem;">That's the difference between a campaign that worked and a partnership that compounds.</p>
+  </div>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer>
+  <div class="container-wide">
+    <span>Force of Nature × OOFOS · 2025—2026</span>
+    <span>Performance · MarTech · Analytics</span>
+  </div>
+</footer>
+
+<script>
+// ─── Chart.js global defaults ───
+Chart.defaults.font.family = "'Instrument Sans', sans-serif";
+Chart.defaults.font.size = 12;
+Chart.defaults.color = '#4a463f';
+Chart.defaults.borderColor = '#d9d1c1';
+
+const COLORS = {
+  ink: '#1f1d1a',
+  inkSoft: '#4a463f',
+  inkFaint: '#8a8278',
+  rule: '#d9d1c1',
+  accent: '#b8552d',
+  accentSoft: '#d97a4e',
+  accentBg: 'rgba(184, 85, 45, 0.12)',
+  positive: '#4a6741',
+  negative: '#8a3a2a',
+  bg: '#f5f1ea'
+};
+
+// ─── DATA ───
+
+// Months Jan 2024 → Mar 2026 (27 months)
+const months = [
+  'Jan 24','Feb 24','Mar 24','Apr 24','May 24','Jun 24','Jul 24','Aug 24','Sep 24','Oct 24','Nov 24','Dec 24',
+  'Jan 25','Feb 25','Mar 25','Apr 25','May 25','Jun 25','Jul 25','Aug 25','Sep 25','Oct 25','Nov 25','Dec 25',
+  'Jan 26','Feb 26','Mar 26'
+];
+
+// New customers monthly (from Q4 deck + Q1'26 deck — using YoY-aware figures from QBR narrative)
+// We'll compute YoY % growth from raw monthly counts
+const newCustomers = [
+  63494, 30003, 36244, 41489, 51722, 49318, 46599, 35495, 26122, 27033, 46504, 38019, // 2024
+  20301, 17380, 21004, 26625, 50438, 49921, 36015, 77156, 53579, 30239, 62078, 47550, // 2025
+  44585, 26748, 32934 // 2026 (Q1)
+];
+
+// Compute YoY % for each month from Jan 2025 onward (vs same month prior year)
+const yoyLabels = months.slice(12); // Jan 2025 onward
+const yoyValues = [];
+for (let i = 12; i < newCustomers.length; i++) {
+  const prior = newCustomers[i - 12];
+  const curr = newCustomers[i];
+  const yoy = ((curr - prior) / prior) * 100;
+  yoyValues.push(yoy);
+}
+
+// ─── CHART 1: YoY New Customer Trajectory ───
+const trajCtx = document.getElementById('chart-trajectory').getContext('2d');
+
+// Build segment colors so positive bars use accent, negative use neutral
+const barColors = yoyValues.map(v => v >= 0 ? COLORS.accent : COLORS.inkFaint);
+const barColorsSoft = yoyValues.map(v => v >= 0 ? COLORS.accentSoft : '#bcb5a8');
+
+new Chart(trajCtx, {
+  type: 'bar',
+  data: {
+    labels: yoyLabels,
+    datasets: [{
+      label: 'YoY New Customer Growth (%)',
+      data: yoyValues,
+      backgroundColor: barColorsSoft,
+      borderColor: barColors,
+      borderWidth: 1.5,
+      borderRadius: 2,
+      barThickness: 'flex',
+      maxBarThickness: 28
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: COLORS.ink,
+        titleColor: COLORS.bg,
+        bodyColor: COLORS.bg,
+        borderColor: COLORS.accent,
+        borderWidth: 1,
+        cornerRadius: 2,
+        padding: 12,
+        titleFont: { family: "'JetBrains Mono', monospace", size: 10, weight: '500' },
+        bodyFont: { family: "'Fraunces', Georgia, serif", size: 16 },
+        displayColors: false,
+        callbacks: {
+          label: function(ctx) {
+            const v = ctx.parsed.y;
+            return (v >= 0 ? '+' : '') + v.toFixed(1) + '% YoY';
+          }
+        }
+      },
+      annotation: {} // placeholder — we'll draw start line manually via x-axis tick styling
+    },
+    scales: {
+      x: {
+        grid: { display: false },
+        ticks: {
+          color: COLORS.inkFaint,
+          font: { family: "'JetBrains Mono', monospace", size: 9 },
+          maxRotation: 0,
+          autoSkip: true,
+          autoSkipPadding: 12
+        },
+        border: { color: COLORS.rule }
+      },
+      y: {
+        grid: { color: COLORS.rule, drawTicks: false },
+        ticks: {
+          color: COLORS.inkFaint,
+          font: { family: "'JetBrains Mono', monospace", size: 10 },
+          padding: 10,
+          callback: v => (v >= 0 ? '+' : '') + v + '%'
+        },
+        border: { display: false }
+      }
+    }
+  },
+  plugins: [{
+    id: 'engagementMarker',
+    afterDraw(chart) {
+      const { ctx, chartArea, scales } = chart;
+      // Mark "April 2025" — engagement start. yoyLabels[3] = 'Apr 25'
+      const xScale = scales.x;
+      const xPos = xScale.getPixelForValue('Apr 25');
+
+      ctx.save();
+      ctx.strokeStyle = COLORS.ink;
+      ctx.lineWidth = 1;
+      ctx.setLineDash([3, 3]);
+      ctx.beginPath();
+      ctx.moveTo(xPos, chartArea.top);
+      ctx.lineTo(xPos, chartArea.bottom);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Label
+      ctx.fillStyle = COLORS.ink;
+      ctx.font = "500 9px 'JetBrains Mono', monospace";
+      ctx.textAlign = 'left';
+      ctx.fillText('FoN ENGAGEMENT BEGINS', xPos + 6, chartArea.top + 12);
+
+      ctx.restore();
+    }
+  }]
+});
+
+// ─── CHART 2: Prospecting vs Retargeting — handled as SVG slope chart in HTML ───
+// (No JS needed; CSS animations handle the entrance.)
+
+// ─── CHART 3: Channel Spend Mix — Diverging Bars (Q1 2025 ←→ Q1 2026) ───
+// Channels ordered by combined activity. Q1 2025 spend shown as negative (left), Q1 2026 as positive (right).
+
+const channelData = [
+  { channel: 'Meta',                 q1_2025: 1200977, q1_2026: 1913547 },
+  { channel: 'Google',               q1_2025: 1375426, q1_2026: 1033356 },
+  { channel: 'TikTok',               q1_2025:  152838, q1_2026:  194677 },
+  { channel: 'Roku / CTV',           q1_2025:       0, q1_2026:  176270 },
+  { channel: 'DV360 / Programmatic', q1_2025:       0, q1_2026:  131399 },
+  { channel: 'YouTube',              q1_2025:   80876, q1_2026:       0 },
+  { channel: 'Bing',                 q1_2025:   71966, q1_2026:       0 },
+  { channel: 'Pinterest',            q1_2025:   42833, q1_2026:   47946 }
+];
+
+const labels       = channelData.map(d => d.channel);
+const data2025_neg = channelData.map(d => -d.q1_2025);
+const data2026_pos = channelData.map(d => d.q1_2026);
+
+const mixCtx = document.getElementById('chart-channelmix').getContext('2d');
+new Chart(mixCtx, {
+  type: 'bar',
+  data: {
+    labels: labels,
+    datasets: [
+      {
+        label: 'Q1 2025',
+        data: data2025_neg,
+        backgroundColor: COLORS.inkSoft,
+        borderColor: COLORS.inkSoft,
+        borderWidth: 0,
+        borderRadius: { topLeft: 2, bottomLeft: 2, topRight: 0, bottomRight: 0 },
+        borderSkipped: false,
+        barThickness: 'flex',
+        maxBarThickness: 22,
+        categoryPercentage: 0.85,
+        barPercentage: 0.92
+      },
+      {
+        label: 'Q1 2026',
+        data: data2026_pos,
+        backgroundColor: COLORS.accent,
+        borderColor: COLORS.accent,
+        borderWidth: 0,
+        borderRadius: { topLeft: 0, bottomLeft: 0, topRight: 2, bottomRight: 2 },
+        borderSkipped: false,
+        barThickness: 'flex',
+        maxBarThickness: 22,
+        categoryPercentage: 0.85,
+        barPercentage: 0.92
+      }
+    ]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    maintainAspectRatio: false,
+    layout: { padding: { top: 36, left: 8, right: 8, bottom: 4 } },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: COLORS.ink,
+        titleColor: COLORS.bg,
+        bodyColor: COLORS.bg,
+        cornerRadius: 2,
+        padding: 12,
+        titleFont: { family: "'JetBrains Mono', monospace", size: 10, weight: '500' },
+        bodyFont: { family: "'Fraunces', Georgia, serif", size: 15 },
+        displayColors: false,
+        callbacks: {
+          title: function(items) { return items[0].label.toUpperCase(); },
+          label: function(ctx) {
+            const v = Math.abs(ctx.parsed.x);
+            return ' ' + ctx.dataset.label + ':  $' + (v / 1000).toFixed(0) + 'K';
+          }
+        }
+      }
+    },
+    scales: {
+      x: {
+        stacked: false,
+        grid: { color: COLORS.rule, drawTicks: false },
+        ticks: {
+          color: COLORS.inkFaint,
+          font: { family: "'JetBrains Mono', monospace", size: 10 },
+          callback: v => '$' + (Math.abs(v) / 1000000).toFixed(1) + 'M'
+        },
+        border: { display: false },
+        min: -2100000,
+        max:  2100000
+      },
+      y: {
+        stacked: true,
+        grid: { display: false, drawBorder: false },
+        ticks: {
+          color: COLORS.ink,
+          font: { family: "'Instrument Sans', sans-serif", size: 13, weight: '500' },
+          padding: 8
+        },
+        border: { display: false }
+      }
+    },
+    animation: { duration: 800, easing: 'easeOutQuart' }
+  },
+  plugins: [{
+    id: 'divergingHeaders',
+    afterDraw(chart) {
+      const { ctx, chartArea, scales } = chart;
+      const xZero = scales.x.getPixelForValue(0);
+      const yTop  = chartArea.top;
+
+      ctx.save();
+
+      // Centerline
+      ctx.strokeStyle = COLORS.ink;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(xZero, chartArea.top - 22);
+      ctx.lineTo(xZero, chartArea.bottom);
+      ctx.stroke();
+
+      // Period header labels
+      ctx.font = "500 10px 'JetBrains Mono', monospace";
+      ctx.textBaseline = 'bottom';
+
+      ctx.fillStyle = COLORS.inkFaint;
+      ctx.textAlign = 'right';
+      ctx.fillText('Q1 2025  ←', xZero - 12, yTop - 8);
+
+      ctx.fillStyle = COLORS.accent;
+      ctx.textAlign = 'left';
+      ctx.fillText('→  Q1 2026', xZero + 12, yTop - 8);
+
+      ctx.restore();
+    }
+  }, {
+    id: 'barValueLabels',
+    afterDatasetsDraw(chart) {
+      const { ctx } = chart;
+      ctx.save();
+      ctx.font = "500 10px 'JetBrains Mono', monospace";
+
+      chart.data.datasets.forEach((dataset, datasetIndex) => {
+        const meta = chart.getDatasetMeta(datasetIndex);
+        meta.data.forEach((bar, index) => {
+          const value = dataset.data[index];
+          if (value === 0) return;
+          const absVal = Math.abs(value);
+          const formatted = absVal >= 1000000
+            ? '$' + (absVal / 1000000).toFixed(2) + 'M'
+            : '$' + (absVal / 1000).toFixed(0) + 'K';
+
+          const isLeft = value < 0;
+          const offset = 8;
+          ctx.textAlign = isLeft ? 'right' : 'left';
+          ctx.fillStyle = isLeft ? COLORS.inkSoft : COLORS.accent;
+          ctx.textBaseline = 'middle';
+          ctx.fillText(formatted, bar.x + (isLeft ? -offset : offset), bar.y);
+        });
+      });
+      ctx.restore();
+    }
+  }]
+});
+
+// ─── Reveal-on-scroll ───
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      observer.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('article, .chart-block, .closing').forEach(el => {
+  el.classList.add('reveal');
+  observer.observe(el);
+});
+
+</script>
+</body>
+</html>
